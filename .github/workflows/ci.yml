@@ -1,0 +1,80 @@
+# CI M3ak : lint (ruff) + tests unitaires (pytest) par module, build des images.
+# Les tests d'intégration (nécessitant l'infrastructure) sont exclus ici.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  qualite:
+    name: Qualité — ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [contracts, corpus, recherche, conversation, documents, llm, whatsapp]
+        include:
+          - module: contracts
+            chemin: contracts
+          - module: corpus
+            chemin: services/corpus
+          - module: recherche
+            chemin: services/recherche
+          - module: conversation
+            chemin: services/conversation
+          - module: documents
+            chemin: services/documents
+          - module: llm
+            chemin: services/llm
+          - module: whatsapp
+            chemin: services/whatsapp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install contracts/ pytest ruff
+          if [ "${{ matrix.module }}" != "contracts" ]; then
+            pip install ${{ matrix.chemin }}
+          fi
+      - name: Lint (ruff)
+        run: ruff check ${{ matrix.chemin }}
+      - name: Tests unitaires (pytest)
+        run: pytest ${{ matrix.chemin }}/tests -q
+
+  frontend:
+    name: Frontend — lint et build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Installation des workspaces npm
+        run: npm ci
+      - name: Lint (eslint)
+        run: npm run lint --workspace services/frontend
+      - name: Tests unitaires (vitest)
+        run: npm run test --workspace services/frontend
+      - name: Build (next build)
+        run: npm run build --workspace services/frontend
+
+  images:
+    name: Image Docker — ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [corpus, recherche, conversation, documents, llm, whatsapp, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construction de l'image
+        run: docker build -f services/${{ matrix.service }}/Dockerfile -t m3ak/${{ matrix.service }}:ci .

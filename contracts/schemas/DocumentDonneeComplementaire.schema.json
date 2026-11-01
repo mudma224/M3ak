@@ -1,0 +1,220 @@
+{
+  "$defs": {
+    "ChampsDonneeComplementaire": {
+      "description": "Champs spécifiques à la collection des données ouvertes.",
+      "properties": {
+        "organisme_producteur": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organisme Producteur"
+        },
+        "licence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Licence de réutilisation (ex. ODbL-1.0)",
+          "title": "Licence"
+        },
+        "date_mise_a_jour": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Date Mise A Jour"
+        }
+      },
+      "title": "ChampsDonneeComplementaire",
+      "type": "object"
+    },
+    "Collection": {
+      "description": "Collections documentaires — la nature de la source détermine la valeur.",
+      "enum": [
+        "textes_normatifs",
+        "procedures",
+        "jurisprudence",
+        "donnees_complementaires",
+        "documents_utilisateur"
+      ],
+      "title": "Collection",
+      "type": "string"
+    },
+    "EmpreinteContenu": {
+      "description": "Empreinte d'un contenu, pour détecter toute modification silencieuse.",
+      "properties": {
+        "algorithme": {
+          "default": "sha256",
+          "title": "Algorithme",
+          "type": "string"
+        },
+        "valeur": {
+          "title": "Valeur",
+          "type": "string"
+        }
+      },
+      "required": [
+        "valeur"
+      ],
+      "title": "EmpreinteContenu",
+      "type": "object"
+    },
+    "HorodatageCollecte": {
+      "description": "Dates de référence d'un document dans le corpus.",
+      "properties": {
+        "date_publication": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Date de publication ou d'adoption",
+          "title": "Date Publication"
+        },
+        "date_recuperation": {
+          "description": "Date de collecte (date de consultation)",
+          "format": "date-time",
+          "title": "Date Recuperation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "date_recuperation"
+      ],
+      "title": "HorodatageCollecte",
+      "type": "object"
+    },
+    "IdentifiantStable": {
+      "description": "Identifiant stable d'un document.\n\nConstruit à partir du numéro officiel, de la langue et de la version.\nLes variantes linguistiques d'un même texte partagent ``numero_officiel``\net ``version`` : c'est ce lien qui permet le repli interlingue\n(trouver la version arabe d'un texte français, et inversement).",
+      "properties": {
+        "numero_officiel": {
+          "description": "Numéro officiel du texte, ou identifiant source pour les procédures/décisions",
+          "title": "Numero Officiel",
+          "type": "string"
+        },
+        "langue": {
+          "$ref": "#/$defs/Langue"
+        },
+        "version": {
+          "default": "originale",
+          "description": "Version du texte : 'originale' ou 'consolidée-AAAA-MM'",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "numero_officiel",
+        "langue"
+      ],
+      "title": "IdentifiantStable",
+      "type": "object"
+    },
+    "Langue": {
+      "description": "Langues des documents et des échanges (BCP 47 : ar-MA, fr-MA).",
+      "enum": [
+        "ar",
+        "fr"
+      ],
+      "title": "Langue",
+      "type": "string"
+    },
+    "StatutJuridique": {
+      "description": "Statut juridique d'un texte.\n\nRéservé : la première version du corpus ne le renseigne pas\n(valeur ``INCONNU`` par défaut). Le champ existe pour éviter toute\nrefonte du schéma lors de sa future alimentation.",
+      "enum": [
+        "en_vigueur",
+        "modifie",
+        "abroge",
+        "inconnu"
+      ],
+      "title": "StatutJuridique",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "identifiant": {
+      "$ref": "#/$defs/IdentifiantStable"
+    },
+    "collection": {
+      "$ref": "#/$defs/Collection",
+      "default": "donnees_complementaires"
+    },
+    "source": {
+      "description": "Portail d'origine (adala, sgg, idarati, jurisprudence_ma, data_gov)",
+      "title": "Source",
+      "type": "string"
+    },
+    "titre": {
+      "title": "Titre",
+      "type": "string"
+    },
+    "langue": {
+      "$ref": "#/$defs/Langue"
+    },
+    "url_source": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Lien vers l'original — renseigné par la couche affichage (après la V1) ; les identifiants sources permettent de le reconstruire",
+      "title": "Url Source"
+    },
+    "chemin_local": {
+      "description": "Emplacement du fichier dans la couche brute",
+      "title": "Chemin Local",
+      "type": "string"
+    },
+    "dates": {
+      "$ref": "#/$defs/HorodatageCollecte"
+    },
+    "empreinte": {
+      "$ref": "#/$defs/EmpreinteContenu"
+    },
+    "statut_juridique": {
+      "$ref": "#/$defs/StatutJuridique",
+      "default": "inconnu",
+      "description": "Réservé — non renseigné en V1 ; alimenté par le rapprochement BO ultérieur"
+    },
+    "specifics": {
+      "$ref": "#/$defs/ChampsDonneeComplementaire"
+    }
+  },
+  "required": [
+    "identifiant",
+    "source",
+    "titre",
+    "langue",
+    "chemin_local",
+    "dates",
+    "empreinte",
+    "specifics"
+  ],
+  "title": "DocumentDonneeComplementaire",
+  "type": "object"
+}

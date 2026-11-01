@@ -1,0 +1,30 @@
+# Configuration statique Traefik — passerelle M3ak (développement local).
+# Seul point exposé : entrypoint web (port 80, lié à 127.0.0.1 dans compose).
+
+entryPoints:
+  web:
+    address: ":80"
+
+providers:
+  docker:
+    # NOTE : l'endpoint du daemon Docker n'est PAS défini ici — source de vérité
+    # unique = drapeau CLI dans docker-compose.yml, piloté par TRAEFIK_DOCKER_ENDPOINT
+    # (par défaut le socket Unix ; tcp://host.docker.internal:2375 sur Docker Desktop
+    # si le socket proxié pose problème, voir docs/runbook.md §10).
+    exposedByDefault: false
+    network: m3ak-edge
+
+api:
+  dashboard: true
+  # Développement local uniquement : dashboard sans authentification sur :8080.
+  # En production : api.insecure=false + authentification middleware (voir runbook).
+  insecure: true
+
+ping:
+  entryPoint: web
+
+log:
+  level: INFO
+
+accessLog:
+  format: json

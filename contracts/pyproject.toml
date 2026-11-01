@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "m3ak-contracts"
+version = "0.9.0"
+description = "Contrats partages du projet M3ak : schemas des documents, fiches, decisions, segments et messages"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+]
+
+[tool.setuptools.packages.find]
+include = ["m3ak_contracts*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

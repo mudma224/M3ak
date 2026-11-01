@@ -1,0 +1,24 @@
+{
+  "name": "m3ak",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@12.0.2",
+  "description": "Plateforme M3ak — orchestration des tâches du monorepo via Turborepo (ADR-0004)",
+  "workspaces": [
+    "contracts",
+    "services/*"
+  ],
+  "scripts": {
+    "docker:build": "docker compose -f infra/docker-compose.yml --project-directory infra build",
+    "docker:up": "docker compose -f infra/docker-compose.yml --project-directory infra up -d",
+    "docker:down": "docker compose -f infra/docker-compose.yml --project-directory infra down",
+    "docker:ps": "docker compose -f infra/docker-compose.yml --project-directory infra ps",
+    "docker:logs": "docker compose -f infra/docker-compose.yml --project-directory infra logs --tail 50",
+    "verifier": "bash tools/verifier_sante.sh",
+    "demo:rabbitmq": "python tools/publier_message_test.py",
+    "qualite": "turbo run lint test schemas"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  }
+}

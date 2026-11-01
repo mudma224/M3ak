@@ -1,0 +1,67 @@
+# --- Secrets et environnement ---
+.env
+*.env.local
+infra/.env
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Node (frontend phase 3) + Turborepo ---
+node_modules/
+.next/
+out/
+.turbo/
+
+# --- Docker / données locales ---
+volumes/
+infra/volumes/
+*.log
+
+# --- Données du corpus (collectées, jamais versionnées) ---
+# Le / initial est essentiel : sans lui, la règle "corpus/" avalerait services/corpus/
+/corpus/
+/pilot/raw/
+/pilot/normalized/
+/pilot/segments/
+*.pdf
+!docs/**/*.pdf
+
+# --- Éditeurs et système ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Outils et états locaux sans rapport avec la plateforme ---
+.docgen/
+.mimosa/
+.zcode/
+/pilot/classement/
+tableau.html
+
+# --- Artefacts de vérification de types ---
+*.tsbuildinfo
+
+# --- Worker pdf.js (copié depuis node_modules par predev/prebuild) ---
+services/frontend/public/pdf.worker.min.mjs
+
+# --- Documents internes (dépôt destiné à être public) ---
+# Les instructions de travail des agents, le cahier des charges et la
+# formulation initiale restent locaux ; pilot/ est l'espace de travail
+# interne (jeu doré, manifestes, périmètres, listes figées).
+AGENTS.md
+*.docx
+/pilot/

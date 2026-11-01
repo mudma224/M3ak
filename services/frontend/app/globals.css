@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Palette institutionnelle : le vert marocain porte la marque, les neutres
+   portent le texte. Contrastes vérifiés WCAG 2.1 AA (texte/encre ≥ 7:1). */
+@theme {
+  --color-maroc-50: #eef7f2;
+  --color-maroc-100: #d7ebe0;
+  --color-maroc-200: #b3d7c4;
+  --color-maroc-600: #006233;
+  --color-maroc-700: #005229;
+  --color-maroc-800: #0c3d23;
+}
+
+/* Police : latin puis arabe (repli par glyphe) — les deux sont auto-hébergées
+   via les paquets @fontsource (voir layout) : aucune requête vers Google. */
+body {
+  font-family:
+    "Inter Variable",
+    "IBM Plex Sans Arabic",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
+/* Tailwind v4 ne met plus cursor:pointer sur les boutons : l'affordance
+   standard (curseur main) est rétablie pour toute l'interface. */
+button:not(:disabled) {
+  cursor: pointer;
+}

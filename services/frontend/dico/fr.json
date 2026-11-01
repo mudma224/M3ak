@@ -1,0 +1,178 @@
+{
+  "langue": {
+    "autre": "العربية",
+    "vers": "ar"
+  },
+  "meta": {
+    "titre": "M3ak — Assistance juridique et administrative du Maroc",
+    "description": "Posez vos questions en droit marocain et sur les démarches administratives. Réponses qui citent leurs sources officielles, en arabe ou en français, sans compte."
+  },
+  "marque": {
+    "nom": "M3ak",
+    "slogan": "Assistance juridique et administrative"
+  },
+  "accueil": {
+    "titre": "Posez votre question en droit marocain ou sur une démarche administrative",
+    "sousTitre": "Des réponses qui citent leurs sources officielles — en arabe ou en français, sans compte.",
+    "exemplesTitre": "Exemples de questions",
+    "exemples": [
+      "Comment obtenir une copie de mon acte de naissance ?",
+      "Quels sont les délais pour faire appel d'un jugement ?",
+      "Comment déclarer la conclusion d'un contrat de travail ?"
+    ]
+  },
+  "composeur": {
+    "etiquette": "Votre question",
+    "placeholder": "Écrivez votre question ici…",
+    "envoyer": "Envoyer",
+    "envoiEnCours": "En cours…",
+    "indication": "Entrée pour envoyer · Maj+Entrée pour une nouvelle ligne"
+  },
+  "fil": {
+    "label": "Conversation",
+    "vous": "Vous",
+    "enCours": "Réponse en cours de rédaction…"
+  },
+  "discussions": {
+    "titre": "Discussions",
+    "nouvelle": "Nouvelle discussion",
+    "supprimer": "Supprimer",
+    "supprimerTitre": "Supprimer cette discussion ?",
+    "supprimerTexte": "La discussion et tous ses messages seront définitivement supprimés.",
+    "annuler": "Annuler",
+    "fermer": "Fermer le panneau",
+    "menu": "Discussions"
+  },
+  "actions": {
+    "copier": "Copier la réponse",
+    "copie": "Copié !",
+    "modifier": "Modifier et renvoyer la question"
+  },
+  "statuts": {
+    "recherche": "Recherche dans le corpus juridique…",
+    "generation": "Rédaction de la réponse sourcée…"
+  },
+  "temps": {
+    "seconde": "s",
+    "minute": "min"
+  },
+  "sources": {
+    "titre": "Sources consultées",
+    "titreNonRepondant": "Passages consultés (aucun ne répond à la question)",
+    "badge": {
+      "segment": "Texte officiel",
+      "fiche": "Procédure administrative",
+      "passage": "Jurisprudence"
+    },
+    "pertinence": "Pertinence",
+    "langue": "Langue",
+    "renvoi": "Voir la source dans le texte original",
+    "consulter": "Consulter le texte intégral",
+    "chargement": "Chargement du document…",
+    "indisponibleDoc": "Document indisponible.",
+    "fermer": "Fermer le document"
+  },
+  "demarche": {
+    "ouvrir": "Voir la démarche pas à pas",
+    "titre": "Démarche pas à pas",
+    "fermer": "Fermer la démarche",
+    "chargement": "Chargement de la démarche…",
+    "indisponible": "Démarche indisponible.",
+    "progression": "cochées",
+    "objet": "Vérifiez l'objet de la démarche",
+    "pieces": "Réunissez les pièces demandées",
+    "piecesVides": "La source n'annonce aucune pièce pour cette démarche.",
+    "piecesIndisponibles": "Les pièces requises ne sont pas encore disponibles pour cette fiche.",
+    "depot": "Déposez votre dossier",
+    "formulaires": "Remplissez les formulaires",
+    "frais": "Acquittez les frais",
+    "delai": "Délai de traitement",
+    "validite": "Validité du document",
+    "retrait": "Retirez votre document"
+  },
+  "refus": {
+    "titre": "Je préfère ne pas répondre",
+    "motifs": {
+      "aucune_source": "Aucune source suffisamment pertinente n'a été trouvée dans le corpus.",
+      "score_insuffisant": "Les sources trouvées ne sont pas assez pertinentes pour garantir une réponse fiable.",
+      "generation_non_verifiable": "Le texte généré n'a pas pu être vérifié mot à mot dans les sources — il n'est pas affiché.",
+      "insuffisant_modele": "Le modèle n'a pas réussi à répondre à partir des seules sources fournies.",
+      "generation_tronquee": "La réponse a été interrompue avant sa fin — un texte incomplet n'est jamais affiché."
+    },
+    "partiel": {
+      "titre": "Réponse partielle",
+      "texte": "Les sources consultées traitent de sujets proches, mais aucune ne répond pleinement à votre question. Les extraits ci-dessus proviennent du corpus et sont cités de leurs sources. Reformulez votre question ou consultez un professionnel (avocat, administration compétente)."
+    },
+    "sansReponse": {
+      "note": "Aucun des passages consultés ne permet de répondre à votre question — l'assistant en décrit le contenu ci-dessus pour vous orienter."
+    },
+    "partielIncomplet": {
+      "titre": "Réponse partielle",
+      "texte": "La génération n'a pas pu être menée à bout de façon entièrement vérifiable : seuls les extraits vérifiés mot à mot dans les sources sont affichés, avec leurs citations. Reformulez votre question ou consultez un professionnel (avocat, administration compétente)."
+    },
+    "couverture": {
+      "titre": "Ce que couvre la plateforme aujourd'hui",
+      "textes": {
+        "label": "Textes officiels",
+        "domaines": [
+          "droit civil",
+          "droit pénal",
+          "droit administratif",
+          "finances",
+          "industrie et économie",
+          "fonction publique",
+          "éducation"
+        ]
+      },
+      "procedures": {
+        "label": "Procédures administratives",
+        "domaines": [
+          "famille et état civil",
+          "citoyenneté et documents d'identité",
+          "droit et justice",
+          "emploi",
+          "éducation"
+        ]
+      },
+      "jurisprudence": {
+        "label": "Décisions de justice",
+        "domaines": [
+          "procédure civile",
+          "affaires commerciales",
+          "baux",
+          "droit civil",
+          "droit administratif"
+        ]
+      }
+    }
+  },
+  "avertissements": {
+    "titre": "Avant d'agir"
+  },
+  "repli": {
+    "titre": "Sources dans une autre langue",
+    "arabe": "Votre question est en français ; les sources retenues sont en arabe. Les citations sont reproduites fidèlement dans leur langue d'origine, entre guillemets ; l'explication ci-dessus est fournie en français.",
+    "francais": "Votre question est en arabe ; les sources retenues sont en français. Les citations sont reproduites fidèlement dans leur langue d'origine ; l'explication ci-dessus est fournie en arabe."
+  },
+  "erreurs": {
+    "reseau": "Impossible de joindre le service de conversation. Vérifiez votre connexion puis réessayez.",
+    "quota": "Le service est très sollicité en ce moment. Réessayez dans un instant.",
+    "indisponible": "Le service est momentanément indisponible. Réessayez dans un instant."
+  },
+  "signalement": {
+    "bouton": "Signaler cette réponse",
+    "titre": "Signaler cette réponse — pourquoi ?",
+    "raisons": {
+      "hors_sujet": "Hors sujet",
+      "sources": "Sources inadaptées",
+      "incomplet": "Réponse incomplète ou erronée",
+      "affichage": "Problème d'affichage"
+    },
+    "succes": "Merci, votre signalement a été transmis.",
+    "echec": "Le signalement n'a pas pu être transmis. Réessayez."
+  },
+  "decharge": "M3ak informe et oriente ; il ne remplace ni l'avocat, ni le juge, ni l'administration.",
+  "a11y": {
+    "allerContenu": "Aller au contenu"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "description": "Une source retenue — la famille porte la hiérarchie des sources à\nl'affichage : un texte de loi (segment/adala) n'est jamais présenté\ncomme équivalent à une décision de justice ou à une procédure.",
+  "properties": {
+    "unite_id": {
+      "title": "Unite Id",
+      "type": "string"
+    },
+    "famille": {
+      "enum": [
+        "segment",
+        "fiche",
+        "passage"
+      ],
+      "title": "Famille",
+      "type": "string"
+    },
+    "document_id": {
+      "title": "Document Id",
+      "type": "string"
+    },
+    "titre": {
+      "title": "Titre",
+      "type": "string"
+    },
+    "source": {
+      "title": "Source",
+      "type": "string"
+    },
+    "collection": {
+      "title": "Collection",
+      "type": "string"
+    },
+    "langue": {
+      "title": "Langue",
+      "type": "string"
+    },
+    "score": {
+      "description": "Pertinence croisée 0-1 (reranker)",
+      "title": "Score",
+      "type": "number"
+    }
+  },
+  "required": [
+    "unite_id",
+    "famille",
+    "document_id",
+    "titre",
+    "source",
+    "collection",
+    "langue",
+    "score"
+  ],
+  "title": "SourceCitee",
+  "type": "object"
+}

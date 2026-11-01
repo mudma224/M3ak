@@ -1,0 +1,18 @@
+# Contexte de build = racine du dépôt ; on n'envoie que l'essentiel aux images.
+# (les services sont volontairement inclus : chaque Dockerfile COPY le sien)
+.git
+.github
+.docgen
+.mimosa
+.mimosa.caches
+docs
+infra
+tools
+AGENTS.md
+README.md
+Cahier_des_charges_M3ak.docx
+Formulation_claire_du_projet.docx
+*.pyc
+**/__pycache__
+.pytest_cache
+.env

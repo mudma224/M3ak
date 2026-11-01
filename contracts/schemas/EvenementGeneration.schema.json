@@ -1,0 +1,150 @@
+{
+  "description": "Un événement du flux SSE de génération (étape 3bis).\n\nSéquence nominale : un seul `debut` en tête (fournisseur et modèle\nrésolus), puis des `fragment` au fil de la production, puis un `fin`\n(usage final, latence, attente). Un `erreur` remplace le reste du flux\nsi le fournisseur tombe après ouverture — le statut HTTP est déjà\nparti (200), l'incident voyage donc dans le flux.",
+  "properties": {
+    "type": {
+      "enum": [
+        "debut",
+        "fragment",
+        "fin",
+        "erreur"
+      ],
+      "title": "Type",
+      "type": "string"
+    },
+    "texte": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "fragment : le morceau de texte produit",
+      "title": "Texte"
+    },
+    "fournisseur": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "debut : fournisseur effectivement utilisé",
+      "title": "Fournisseur"
+    },
+    "modele": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "debut : modèle résolu côté fournisseur",
+      "title": "Modele"
+    },
+    "jetons_entree": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "fin : jetons du prompt (estimés si le fournisseur ne les rapporte pas)",
+      "title": "Jetons Entree"
+    },
+    "jetons_sortie": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "fin : jetons produits (estimés si le fournisseur ne les rapporte pas)",
+      "title": "Jetons Sortie"
+    },
+    "latence_ms": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "fin : durée de la génération elle-même",
+      "title": "Latence Ms"
+    },
+    "attendu": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "fin : vrai si la requête a patienté dans la file",
+      "title": "Attendu"
+    },
+    "attente_secondes": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "fin : temps passé en file d'attente",
+      "title": "Attente Secondes"
+    },
+    "erreur": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "erreur : description de l'incident",
+      "title": "Erreur"
+    },
+    "complet": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "fin : vrai si le fournisseur a terminé naturellement, faux si le budget de jetons a tronqué la réponse, None s'il ne le signale pas",
+      "title": "Complet"
+    }
+  },
+  "required": [
+    "type"
+  ],
+  "title": "EvenementGeneration",
+  "type": "object"
+}

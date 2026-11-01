@@ -1,0 +1,12 @@
+{
+  "executionEnvironments": [
+    {
+      "root": "tools",
+      "extraPaths": [
+        "services/recherche",
+        "services/corpus",
+        "contracts"
+      ]
+    }
+  ]
+}

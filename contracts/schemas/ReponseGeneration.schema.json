@@ -1,0 +1,77 @@
+{
+  "description": "Texte généré, avec la traçabilité de consommation du quota.",
+  "properties": {
+    "texte": {
+      "title": "Texte",
+      "type": "string"
+    },
+    "fournisseur": {
+      "title": "Fournisseur",
+      "type": "string"
+    },
+    "modele": {
+      "title": "Modele",
+      "type": "string"
+    },
+    "jetons_entree": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Jetons Entree"
+    },
+    "jetons_sortie": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Jetons Sortie"
+    },
+    "latence_ms": {
+      "default": 0,
+      "title": "Latence Ms",
+      "type": "integer"
+    },
+    "attendu": {
+      "default": false,
+      "description": "Vrai si la requête a patienté dans la file (quota atteint)",
+      "title": "Attendu",
+      "type": "boolean"
+    },
+    "attente_secondes": {
+      "default": 0.0,
+      "title": "Attente Secondes",
+      "type": "number"
+    },
+    "complet": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Vrai si le fournisseur a terminé naturellement ; faux si le budget de jetons a tronqué la réponse ; None si le fournisseur ne le signale pas",
+      "title": "Complet"
+    }
+  },
+  "required": [
+    "texte",
+    "fournisseur",
+    "modele"
+  ],
+  "title": "ReponseGeneration",
+  "type": "object"
+}

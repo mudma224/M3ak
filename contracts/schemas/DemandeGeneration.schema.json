@@ -1,0 +1,73 @@
+{
+  "$defs": {
+    "MessageGeneration": {
+      "description": "Un message du fil envoyé au fournisseur.",
+      "properties": {
+        "role": {
+          "enum": [
+            "system",
+            "user",
+            "assistant"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "contenu": {
+          "maxLength": 64000,
+          "minLength": 1,
+          "title": "Contenu",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "contenu"
+      ],
+      "title": "MessageGeneration",
+      "type": "object"
+    }
+  },
+  "description": "Demande de génération — température 0 par défaut (harnais reproductible).",
+  "properties": {
+    "messages": {
+      "items": {
+        "$ref": "#/$defs/MessageGeneration"
+      },
+      "minItems": 1,
+      "title": "Messages",
+      "type": "array"
+    },
+    "temperature": {
+      "default": 0.0,
+      "maximum": 2.0,
+      "minimum": 0.0,
+      "title": "Temperature",
+      "type": "number"
+    },
+    "max_jetons": {
+      "default": 1024,
+      "maximum": 8192,
+      "minimum": 16,
+      "title": "Max Jetons",
+      "type": "integer"
+    },
+    "fournisseur": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "None = fournisseur par défaut de la configuration ; le service valide contre ses fournisseurs configurés",
+      "title": "Fournisseur"
+    }
+  },
+  "required": [
+    "messages"
+  ],
+  "title": "DemandeGeneration",
+  "type": "object"
+}

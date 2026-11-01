@@ -1,0 +1,172 @@
+{
+  "$defs": {
+    "Langue": {
+      "description": "Langues des documents et des échanges (BCP 47 : ar-MA, fr-MA).",
+      "enum": [
+        "ar",
+        "fr"
+      ],
+      "title": "Langue",
+      "type": "string"
+    }
+  },
+  "description": "Une décision de justice prête à l'indexation.\n\nConstruite par le service corpus, publiée au service recherche via la\nfile ``decisions.to_index``. L'idempotence côté consommation s'appuie\nsur ``decision_id`` : rejouer un message ne crée jamais de doublon.",
+  "properties": {
+    "decision_id": {
+      "description": "Identifiant unique et stable de la décision (clé d'idempotence de l'indexation)",
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "document_id": {
+      "description": "Clé canonique du document normalisé parent",
+      "title": "Document Id",
+      "type": "string"
+    },
+    "titre": {
+      "minLength": 1,
+      "title": "Titre",
+      "type": "string"
+    },
+    "langue": {
+      "$ref": "#/$defs/Langue",
+      "description": "Langue du texte intégral (ar), sinon le résumé (fr)"
+    },
+    "thematiques": {
+      "description": "Slugs des thématiques de la source",
+      "items": {
+        "type": "string"
+      },
+      "title": "Thematiques",
+      "type": "array"
+    },
+    "juridiction": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Juridiction"
+    },
+    "ville": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Ville"
+    },
+    "type_decision": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Type Decision"
+    },
+    "numero_decision": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Numero Decision"
+    },
+    "numero_dossier": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Numero Dossier"
+    },
+    "date_decision": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Date de la décision au format ISO (AAAA-MM-JJ), si connue",
+      "title": "Date Decision"
+    },
+    "resume_francais": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resume Francais"
+    },
+    "resume_arabe": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resume Arabe"
+    },
+    "texte_integral_arabe": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Texte Integral Arabe"
+    },
+    "texte_integral_francais": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Texte Integral Francais"
+    }
+  },
+  "required": [
+    "decision_id",
+    "document_id",
+    "titre",
+    "langue"
+  ],
+  "title": "DecisionAIndexer",
+  "type": "object"
+}

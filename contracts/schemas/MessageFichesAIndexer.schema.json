@@ -1,0 +1,141 @@
+{
+  "$defs": {
+    "ChargeFichesAIndexer": {
+      "description": "Lot de fiches de procédures publié par corpus à destination de\nrecherche — file dédiée, gestion séparée des segments d'articles.",
+      "properties": {
+        "type_message": {
+          "default": "fiches_a_indexer",
+          "title": "Type Message",
+          "type": "string"
+        },
+        "fiches": {
+          "items": {
+            "$ref": "#/$defs/FicheAIndexer"
+          },
+          "minItems": 1,
+          "title": "Fiches",
+          "type": "array"
+        }
+      },
+      "required": [
+        "fiches"
+      ],
+      "title": "ChargeFichesAIndexer",
+      "type": "object"
+    },
+    "FicheAIndexer": {
+      "description": "Une fiche de procédure prête à l'indexation.\n\nConstruite par le service corpus, publiée au service recherche via la\nfile ``fiches.to_index``. L'idempotence côté consommation s'appuie sur\n``fiche_id`` : rejouer un message ne crée jamais de doublon.",
+      "properties": {
+        "fiche_id": {
+          "description": "Identifiant unique et stable de la fiche (clé d'idempotence de l'indexation)",
+          "title": "Fiche Id",
+          "type": "string"
+        },
+        "document_id": {
+          "description": "Clé canonique du document normalisé parent",
+          "title": "Document Id",
+          "type": "string"
+        },
+        "titre": {
+          "minLength": 1,
+          "title": "Titre",
+          "type": "string"
+        },
+        "langue": {
+          "$ref": "#/$defs/Langue"
+        },
+        "texte": {
+          "description": "Contenu textuel de la fiche, sans balisage",
+          "minLength": 1,
+          "title": "Texte",
+          "type": "string"
+        },
+        "thematique_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Identifiant de la thématique Idarati, si connue",
+          "title": "Thematique Id"
+        },
+        "administration": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Administration en charge de la procédure",
+          "title": "Administration"
+        }
+      },
+      "required": [
+        "fiche_id",
+        "document_id",
+        "titre",
+        "langue",
+        "texte"
+      ],
+      "title": "FicheAIndexer",
+      "type": "object"
+    },
+    "Langue": {
+      "description": "Langues des documents et des échanges (BCP 47 : ar-MA, fr-MA).",
+      "enum": [
+        "ar",
+        "fr"
+      ],
+      "title": "Langue",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "message_id": {
+      "title": "Message Id",
+      "type": "string"
+    },
+    "correlation_id": {
+      "description": "Identifiant de corrélation propagé de bout en bout",
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "emis_le": {
+      "format": "date-time",
+      "title": "Emis Le",
+      "type": "string"
+    },
+    "emis_par": {
+      "description": "Nom du service émetteur",
+      "title": "Emis Par",
+      "type": "string"
+    },
+    "type_message": {
+      "default": "fiches_a_indexer",
+      "title": "Type Message",
+      "type": "string"
+    },
+    "charge": {
+      "$ref": "#/$defs/ChargeFichesAIndexer"
+    }
+  },
+  "required": [
+    "correlation_id",
+    "emis_par",
+    "charge"
+  ],
+  "title": "MessageFichesAIndexer",
+  "type": "object"
+}

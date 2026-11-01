@@ -1,0 +1,9 @@
+{
+  "name": "@m3ak/corpus",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "lint": "ruff check .",
+    "test": "python -m pytest tests -q"
+  }
+}

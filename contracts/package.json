@@ -1,0 +1,10 @@
+{
+  "name": "@m3ak/contracts",
+  "version": "0.7.0",
+  "private": true,
+  "scripts": {
+    "lint": "ruff check .",
+    "test": "python -m pytest tests -q",
+    "schemas": "python tools/export_schemas.py"
+  }
+}

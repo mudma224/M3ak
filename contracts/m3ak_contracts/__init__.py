@@ -1,0 +1,130 @@
+"""m3ak-contracts — contrats partagés du projet M3ak.
+
+Seul code commun autorisé entre les services : schémas de données,
+segments, messages et DTO HTTP. Aucune logique métier ici (voir AGENTS.md,
+règles de gouvernance inter-services).
+"""
+
+from .common import (
+    Collection,
+    EmpreinteContenu,
+    HorodatageCollecte,
+    IdentifiantStable,
+    Langue,
+    StatutJuridique,
+    TypeTexte,
+)
+from .conversation import (
+    DemandeQuestion,
+    DemandeSignalement,
+    EvenementConversation,
+    MessageHistorique,
+    ReponseHistorique,
+    ReponseQuestion,
+    ReponseSession,
+    ReponseSignalement,
+    SourceCitee,
+)
+from .decisions import DecisionAIndexer
+from .documents import (
+    ChampsDecision,
+    ChampsDonneeComplementaire,
+    ChampsProcedure,
+    ChampsTexteNormatif,
+    DocumentDecision,
+    DocumentDonneeComplementaire,
+    DocumentNormalise,
+    DocumentProcedure,
+    DocumentTexteNormatif,
+    MetadonneesCommunes,
+    ReferenceBulletinOfficiel,
+)
+from .fiches import FicheAIndexer
+from .generation import DemandeGeneration, EvenementGeneration, MessageGeneration, ReponseGeneration
+from .http import ErreurCommune, EtatDependance, ReponseEcho, ReponsePret, ReponseSante
+from .messages import (
+    FILE_DECISIONS_TO_INDEX,
+    FILE_FICHES_TO_INDEX,
+    FILE_OCR_JOBS,
+    FILE_SEGMENTS_TO_INDEX,
+    ChargeDecisionsAIndexer,
+    ChargeFichesAIndexer,
+    ChargeOcrJob,
+    ChargeSegmentsAIndexer,
+    MessageDecisionsAIndexer,
+    MessageFichesAIndexer,
+    MessageOcrJob,
+    MessageSegmentsAIndexer,
+    envelopper,
+)
+from .recherche import (
+    FAMILLES_UNITE,
+    SOURCES_PAR_FAMILLE,
+    ReponseRecherche,
+    RequeteRecherche,
+    ResultatRecherche,
+)
+from .segments import ContexteHierarchique, SegmentArticle
+
+__version__ = "0.7.0"
+
+__all__ = [
+    "FAMILLES_UNITE",
+    "FILE_DECISIONS_TO_INDEX",
+    "FILE_FICHES_TO_INDEX",
+    "FILE_OCR_JOBS",
+    "FILE_SEGMENTS_TO_INDEX",
+    "SOURCES_PAR_FAMILLE",
+    "ChampsDecision",
+    "ChampsDonneeComplementaire",
+    "ChampsProcedure",
+    "ChampsTexteNormatif",
+    "ChargeDecisionsAIndexer",
+    "ChargeFichesAIndexer",
+    "ChargeOcrJob",
+    "ChargeSegmentsAIndexer",
+    "Collection",
+    "ContexteHierarchique",
+    "DecisionAIndexer",
+    "DemandeGeneration",
+    "DemandeQuestion",
+    "DemandeSignalement",
+    "DocumentDecision",
+    "DocumentDonneeComplementaire",
+    "DocumentNormalise",
+    "DocumentProcedure",
+    "DocumentTexteNormatif",
+    "EmpreinteContenu",
+    "ErreurCommune",
+    "EtatDependance",
+    "EvenementConversation",
+    "EvenementGeneration",
+    "FicheAIndexer",
+    "HorodatageCollecte",
+    "IdentifiantStable",
+    "Langue",
+    "MessageDecisionsAIndexer",
+    "MessageFichesAIndexer",
+    "MessageGeneration",
+    "MessageHistorique",
+    "MessageOcrJob",
+    "MessageSegmentsAIndexer",
+    "MetadonneesCommunes",
+    "ReferenceBulletinOfficiel",
+    "ReponseEcho",
+    "ReponseGeneration",
+    "ReponseHistorique",
+    "ReponsePret",
+    "ReponseQuestion",
+    "ReponseRecherche",
+    "ReponseSante",
+    "ReponseSession",
+    "ReponseSignalement",
+    "RequeteRecherche",
+    "ResultatRecherche",
+    "SegmentArticle",
+    "SourceCitee",
+    "StatutJuridique",
+    "TypeTexte",
+    "envelopper",
+]

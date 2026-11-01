@@ -1,0 +1,134 @@
+{
+  "$defs": {
+    "ContexteHierarchique": {
+      "description": "Héritage structurel porté par chaque segment.\n\nIndispensable à la recherche thématique : un étudiant demande « le délai\nde congé du bail commercial », jamais « l'article 664 du DOC ».",
+      "properties": {
+        "texte_identifiant": {
+          "description": "Clé canonique de l'identifiant stable du texte",
+          "title": "Texte Identifiant",
+          "type": "string"
+        },
+        "texte_titre": {
+          "title": "Texte Titre",
+          "type": "string"
+        },
+        "livre": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Livre"
+        },
+        "chapitre": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chapitre"
+        },
+        "section": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Section"
+        }
+      },
+      "required": [
+        "texte_identifiant",
+        "texte_titre"
+      ],
+      "title": "ContexteHierarchique",
+      "type": "object"
+    },
+    "Langue": {
+      "description": "Langues des documents et des échanges (BCP 47 : ar-MA, fr-MA).",
+      "enum": [
+        "ar",
+        "fr"
+      ],
+      "title": "Langue",
+      "type": "string"
+    }
+  },
+  "description": "Un segment d'article prêt à l'indexation.\n\nConstruit par le service corpus, publié au service recherche via la file\n``segments.to_index``. L'idempotence côté consommation s'appuie sur\n``segment_id`` : rejouer un message ne crée jamais de doublon.",
+  "properties": {
+    "segment_id": {
+      "description": "Identifiant unique et stable du segment (clé d'idempotence de l'indexation)",
+      "title": "Segment Id",
+      "type": "string"
+    },
+    "document_id": {
+      "description": "Clé canonique du document normalisé parent",
+      "title": "Document Id",
+      "type": "string"
+    },
+    "articles": {
+      "description": "Numéros d'articles contenus (plusieurs si articles courts regroupés)",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Articles",
+      "type": "array"
+    },
+    "alineas": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Plage d'alinéas couverte pour un article long sous-découpé (ex. '1-4')",
+      "title": "Alineas"
+    },
+    "texte": {
+      "description": "Contenu texte du segment, sans balisage",
+      "minLength": 1,
+      "title": "Texte",
+      "type": "string"
+    },
+    "langue": {
+      "$ref": "#/$defs/Langue"
+    },
+    "contexte": {
+      "$ref": "#/$defs/ContexteHierarchique"
+    },
+    "variantes_linguistiques": {
+      "description": "Clés canoniques des variantes AR/FR du même texte (repli interlingue)",
+      "items": {
+        "type": "string"
+      },
+      "title": "Variantes Linguistiques",
+      "type": "array"
+    }
+  },
+  "required": [
+    "segment_id",
+    "document_id",
+    "articles",
+    "texte",
+    "langue",
+    "contexte"
+  ],
+  "title": "SegmentArticle",
+  "type": "object"
+}

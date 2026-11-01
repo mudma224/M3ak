@@ -1,0 +1,81 @@
+{
+  "$defs": {
+    "ChargeOcrJob": {
+      "description": "Demande de traitement OCR d'un document utilisateur (phase 4).",
+      "properties": {
+        "type_message": {
+          "default": "ocr_job",
+          "title": "Type Message",
+          "type": "string"
+        },
+        "document_utilisateur_id": {
+          "title": "Document Utilisateur Id",
+          "type": "string"
+        },
+        "url_stockage_ephemere": {
+          "title": "Url Stockage Ephemere",
+          "type": "string"
+        },
+        "langue_probable": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Langue Probable"
+        }
+      },
+      "required": [
+        "document_utilisateur_id",
+        "url_stockage_ephemere"
+      ],
+      "title": "ChargeOcrJob",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "message_id": {
+      "title": "Message Id",
+      "type": "string"
+    },
+    "correlation_id": {
+      "description": "Identifiant de corrélation propagé de bout en bout",
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "emis_le": {
+      "format": "date-time",
+      "title": "Emis Le",
+      "type": "string"
+    },
+    "emis_par": {
+      "description": "Nom du service émetteur",
+      "title": "Emis Par",
+      "type": "string"
+    },
+    "type_message": {
+      "default": "ocr_job",
+      "title": "Type Message",
+      "type": "string"
+    },
+    "charge": {
+      "$ref": "#/$defs/ChargeOcrJob"
+    }
+  },
+  "required": [
+    "correlation_id",
+    "emis_par",
+    "charge"
+  ],
+  "title": "MessageOcrJob",
+  "type": "object"
+}

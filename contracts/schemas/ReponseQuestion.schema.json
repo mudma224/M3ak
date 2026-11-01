@@ -1,0 +1,201 @@
+{
+  "$defs": {
+    "SourceCitee": {
+      "description": "Une source retenue — la famille porte la hiérarchie des sources à\nl'affichage : un texte de loi (segment/adala) n'est jamais présenté\ncomme équivalent à une décision de justice ou à une procédure.",
+      "properties": {
+        "unite_id": {
+          "title": "Unite Id",
+          "type": "string"
+        },
+        "famille": {
+          "enum": [
+            "segment",
+            "fiche",
+            "passage"
+          ],
+          "title": "Famille",
+          "type": "string"
+        },
+        "document_id": {
+          "title": "Document Id",
+          "type": "string"
+        },
+        "titre": {
+          "title": "Titre",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "collection": {
+          "title": "Collection",
+          "type": "string"
+        },
+        "langue": {
+          "title": "Langue",
+          "type": "string"
+        },
+        "score": {
+          "description": "Pertinence croisée 0-1 (reranker)",
+          "title": "Score",
+          "type": "number"
+        }
+      },
+      "required": [
+        "unite_id",
+        "famille",
+        "document_id",
+        "titre",
+        "source",
+        "collection",
+        "langue",
+        "score"
+      ],
+      "title": "SourceCitee",
+      "type": "object"
+    }
+  },
+  "description": "Réponse vérifiée — ou refus explicite, jamais de réponse sans source.",
+  "properties": {
+    "session_id": {
+      "title": "Session Id",
+      "type": "string"
+    },
+    "message_id": {
+      "title": "Message Id",
+      "type": "string"
+    },
+    "reponse": {
+      "title": "Reponse",
+      "type": "string"
+    },
+    "langue_question": {
+      "enum": [
+        "ar",
+        "fr"
+      ],
+      "title": "Langue Question",
+      "type": "string"
+    },
+    "refus": {
+      "default": false,
+      "description": "Vrai si aucune source suffisante ou réponse invérifiable",
+      "title": "Refus",
+      "type": "boolean"
+    },
+    "motif_refus": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "aucune_source | score_insuffisant | generation_non_verifiable | insuffisant_modele | generation_tronquee",
+      "title": "Motif Refus"
+    },
+    "sources": {
+      "description": "Passages retenus, numérotés comme les [n] de la réponse",
+      "items": {
+        "$ref": "#/$defs/SourceCitee"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "citations_verifiees": {
+      "default": true,
+      "description": "Vrai si chaque citation verbatim a été retrouvée dans les passages cités",
+      "title": "Citations Verifiees",
+      "type": "boolean"
+    },
+    "citations_rejetees": {
+      "default": 0,
+      "description": "Nombre de renvois [n] rejetés (passage inexistant)",
+      "title": "Citations Rejetees",
+      "type": "integer"
+    },
+    "avertissements": {
+      "description": "Avertissements contextuels (droits, argent, liberté en jeu)",
+      "items": {
+        "type": "string"
+      },
+      "title": "Avertissements",
+      "type": "array"
+    },
+    "repli_interlingue": {
+      "default": false,
+      "description": "Vrai si les sources retenues sont dans l'autre langue que la question",
+      "title": "Repli Interlingue",
+      "type": "boolean"
+    },
+    "texte_partiel": {
+      "default": false,
+      "description": "Vrai si `reponse` porte un texte vérifié diffusé avant un échec final (réponse partielle) — faux pour un refus sec, où `reponse` porte le message de refus standard. L'affichage distingue les deux cas par CE champ, jamais par le contenu du texte.",
+      "title": "Texte Partiel",
+      "type": "boolean"
+    },
+    "sans_reponse": {
+      "default": false,
+      "description": "Vrai si `reponse` est la description VÉRIFIÉE des passages consultés quand aucun ne répond à la question (orientation : ce que les passages contiennent, puis l'absence de réponse est dite explicitement). `refus` reste vrai — aucune réponse fiable n'a été produite — mais `reponse` porte un contenu utile et vérifié, pas un message de refus.",
+      "title": "Sans Reponse",
+      "type": "boolean"
+    },
+    "score_meilleur": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Score Meilleur"
+    },
+    "fournisseur": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Fournisseur"
+    },
+    "modele": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Modele"
+    },
+    "latence_generation_ms": {
+      "default": 0,
+      "title": "Latence Generation Ms",
+      "type": "integer"
+    },
+    "duree_ms": {
+      "default": 0,
+      "title": "Duree Ms",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "session_id",
+    "message_id",
+    "reponse",
+    "langue_question"
+  ],
+  "title": "ReponseQuestion",
+  "type": "object"
+}

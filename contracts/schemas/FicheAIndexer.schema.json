@@ -1,0 +1,75 @@
+{
+  "$defs": {
+    "Langue": {
+      "description": "Langues des documents et des échanges (BCP 47 : ar-MA, fr-MA).",
+      "enum": [
+        "ar",
+        "fr"
+      ],
+      "title": "Langue",
+      "type": "string"
+    }
+  },
+  "description": "Une fiche de procédure prête à l'indexation.\n\nConstruite par le service corpus, publiée au service recherche via la\nfile ``fiches.to_index``. L'idempotence côté consommation s'appuie sur\n``fiche_id`` : rejouer un message ne crée jamais de doublon.",
+  "properties": {
+    "fiche_id": {
+      "description": "Identifiant unique et stable de la fiche (clé d'idempotence de l'indexation)",
+      "title": "Fiche Id",
+      "type": "string"
+    },
+    "document_id": {
+      "description": "Clé canonique du document normalisé parent",
+      "title": "Document Id",
+      "type": "string"
+    },
+    "titre": {
+      "minLength": 1,
+      "title": "Titre",
+      "type": "string"
+    },
+    "langue": {
+      "$ref": "#/$defs/Langue"
+    },
+    "texte": {
+      "description": "Contenu textuel de la fiche, sans balisage",
+      "minLength": 1,
+      "title": "Texte",
+      "type": "string"
+    },
+    "thematique_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Identifiant de la thématique Idarati, si connue",
+      "title": "Thematique Id"
+    },
+    "administration": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Administration en charge de la procédure",
+      "title": "Administration"
+    }
+  },
+  "required": [
+    "fiche_id",
+    "document_id",
+    "titre",
+    "langue",
+    "texte"
+  ],
+  "title": "FicheAIndexer",
+  "type": "object"
+}

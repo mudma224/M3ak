@@ -1,0 +1,450 @@
+# Infra M3ak — six services à frontières fortes, database-per-service.
+# Réseaux : edge (exposés via Traefik), internal (services ↔ infra), backoffice (UIs d'admin).
+# Les secrets proviennent du fichier .env (voir .env.example) — jamais en dur ici.
+
+name: m3ak
+
+networks:
+  edge:
+    name: m3ak-edge
+  internal:
+    name: m3ak-internal
+  backoffice:
+    name: m3ak-backoffice
+
+volumes:
+  corpus-db:
+  recherche-db:
+  conversation-db:
+  documents-db:
+  llm-db:
+  rabbitmq:
+  redis:
+  minio:
+  tei-cache:
+
+# ───────────────────────────── Passerelle ─────────────────────────────
+
+services:
+  traefik:
+    # v3.6 requis : le client Docker embarqué dans les versions antérieures
+    # (v3.1, mi-2024) renvoie "Error response from daemon: " (message vide) face
+    # aux daemons récents (Docker Engine 29.x / API 1.5x), socket Unix comme TCP.
+    image: traefik:v3.6
+    container_name: m3ak-traefik
+    command:
+      - --configFile=/etc/traefik/traefik.yml
+      # Le socket Unix proxié par Docker Desktop (Windows/WSL2) peut renvoyer des
+      # réponses malformées ("Error response from daemon: "). Contournement : exposer
+      # le daemon en TCP (Docker Desktop : Settings → Advanced → "Expose daemon on
+      # TCP without TLS") puis définir TRAEFIK_DOCKER_ENDPOINT ci-dessous dans .env.
+      - --providers.docker.endpoint=${TRAEFIK_DOCKER_ENDPOINT:-unix:///var/run/docker.sock}
+    ports:
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [edge, internal]
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+# ───────────────────────── Bases (une par service) ─────────────────────────
+
+  corpus-db:
+    image: postgres:16
+    container_name: m3ak-corpus-db
+    environment:
+      POSTGRES_USER: u_corpus
+      POSTGRES_PASSWORD: ${POSTGRES_CORPUS_PASSWORD}
+      POSTGRES_DB: db_corpus
+    volumes: [corpus-db:/var/lib/postgresql/data]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U u_corpus -d db_corpus"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  recherche-db:
+    # pgvector : la base d'index du service recherche (embeddings).
+    image: pgvector/pgvector:pg16
+    container_name: m3ak-recherche-db
+    environment:
+      POSTGRES_USER: u_recherche
+      POSTGRES_PASSWORD: ${POSTGRES_RECHERCHE_PASSWORD}
+      POSTGRES_DB: db_recherche
+    volumes: [recherche-db:/var/lib/postgresql/data]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U u_recherche -d db_recherche"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  conversation-db:
+    image: postgres:16
+    container_name: m3ak-conversation-db
+    environment:
+      POSTGRES_USER: u_conversation
+      POSTGRES_PASSWORD: ${POSTGRES_CONVERSATION_PASSWORD}
+      POSTGRES_DB: db_conversation
+    volumes: [conversation-db:/var/lib/postgresql/data]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U u_conversation -d db_conversation"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  documents-db:
+    image: postgres:16
+    container_name: m3ak-documents-db
+    environment:
+      POSTGRES_USER: u_documents
+      POSTGRES_PASSWORD: ${POSTGRES_DOCUMENTS_PASSWORD}
+      POSTGRES_DB: db_documents
+    volumes: [documents-db:/var/lib/postgresql/data]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U u_documents -d db_documents"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  llm-db:
+    image: postgres:16
+    container_name: m3ak-llm-db
+    environment:
+      POSTGRES_USER: u_llm
+      POSTGRES_PASSWORD: ${POSTGRES_LLM_PASSWORD}
+      POSTGRES_DB: db_llm
+    volumes: [llm-db:/var/lib/postgresql/data]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U u_llm -d db_llm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+# ───────────────────────────── Courtier et cache ─────────────────────────────
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: m3ak-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "127.0.0.1:15672:15672"   # UI d'administration — local uniquement
+      - "127.0.0.1:5672:5672"     # AMQP — local uniquement (outils de vérification)
+    volumes: [rabbitmq:/var/lib/rabbitmq]
+    networks: [internal, backoffice]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: m3ak-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redis:/data]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+# ─────────────────────── Infrastructure d'inférence (phase 2) ───────────────────────
+
+  tei-embeddings:
+    # Text Embeddings Inference — serveur d'embeddings du service recherche
+    # (composant d'infrastructure, propriété opérationnelle du service recherche,
+    # comme la base d'index). BGE-M3 : multilingue ar/fr, 1024 dimensions,
+    # pooling CLS. Le modèle (≈ 2,3 Go) est téléchargé dans le volume au premier
+    # démarrage. Pas de healthcheck Docker : l'image minimale n'embarque pas de
+    # client HTTP ; l'état du serveur est exposé par /ready du service recherche,
+    # qui dégrade gracieusement en recherche plein texte si TEI est indisponible.
+    #
+    # Budget mémoire borné (machine de dev 16 Go, séance dédiée) : le warmup
+    # alloue ses buffers d'inférence selon max-batch-tokens — le défaut
+    # (~16k tokens) exige plusieurs Go d'un coup et fait crasher le serveur
+    # en boucle. 4096 tokens ≈ 4 textes de ~1000 tokens par passe interne.
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: m3ak-tei
+    command:
+      - --model-id=BAAI/bge-m3
+      - --pooling=cls
+      - --max-batch-tokens=4096
+      - --max-client-batch-size=32
+      - --max-concurrent-requests=8
+    volumes: [tei-cache:/data]
+    networks: [internal]
+    restart: unless-stopped
+
+  tei-reranker:
+    # Reranker BGE-reranker-v2-m3 — re-classe le pool de candidats du moteur
+    # par pertinence croisée question-passage (étape 2, décision actée).
+    # Poids ONNX int8 : conversion communautaire (BGLAW, mêmes poids) placée
+    # manuellement dans le snapshot du dépôt BAAI (onnx/model.onnx) — le dépôt
+    # BAAI n'expose pas d'ONNX, et le backend candle de TEI sort silencieusement
+    # sur ce modèle ; ORT int8 tient la latence cible (rEGENERATION : retirer
+    # le dossier onnx/ du snapshot pour retélécharger l'original). Même image
+    # que les embeddings : TEI expose /rerank. Budget mémoire borné.
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    container_name: m3ak-tei-reranker
+    command:
+      - --model-id=BAAI/bge-reranker-v2-m3
+      - --max-batch-tokens=4096
+      - --max-client-batch-size=64
+      - --max-concurrent-requests=8
+    volumes: [tei-cache:/data]
+    networks: [internal]
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: m3ak-minio
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "127.0.0.1:9001:9001"     # console — local uniquement
+    volumes: [minio:/data]
+    networks: [internal, backoffice]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+# ─────────────────────────────── Services ───────────────────────────────
+# corpus, recherche et llm sont internes (pas sur edge) : ils ne sont
+# joignables que depuis le réseau Docker, via Traefik pour les tests locaux.
+
+  corpus:
+    build:
+      context: ..
+      dockerfile: services/corpus/Dockerfile
+    image: m3ak/corpus:0.1.0
+    container_name: m3ak-corpus
+    environment:
+      CORPUS_DATABASE_URL: postgresql+psycopg://u_corpus:${POSTGRES_CORPUS_PASSWORD}@corpus-db:5432/db_corpus
+      CORPUS_INTERNAL_TOKEN: ${INTERNAL_TOKEN}
+      CORPUS_RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/%2F
+      CORPUS_STORAGE_BACKEND: minio
+      CORPUS_MINIO_ENDPOINT: minio:9000
+      CORPUS_MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      CORPUS_MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      CORPUS_MINIO_BUCKET: m3ak-corpus-brut
+    networks: [internal]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=m3ak-internal
+      - traefik.http.routers.corpus.rule=Host(`corpus.m3ak.localhost`)
+      - traefik.http.services.corpus.loadbalancer.server.port=8001
+    depends_on:
+      corpus-db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      minio: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  recherche:
+    build:
+      context: ..
+      dockerfile: services/recherche/Dockerfile
+    image: m3ak/recherche:0.1.0
+    container_name: m3ak-recherche
+    environment:
+      RECHERCHE_DATABASE_URL: postgresql+psycopg://u_recherche:${POSTGRES_RECHERCHE_PASSWORD}@recherche-db:5432/db_recherche
+      RECHERCHE_INTERNAL_TOKEN: ${INTERNAL_TOKEN}
+      RECHERCHE_RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/%2F
+      RECHERCHE_TEI_URL: http://tei-embeddings:80
+      RECHERCHE_RERANKER_URL: http://tei-reranker:80
+      RECHERCHE_REDIS_URL: redis://redis:6379/0
+    networks: [internal]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=m3ak-internal
+      - traefik.http.routers.recherche.rule=Host(`recherche.m3ak.localhost`)
+      - traefik.http.services.recherche.loadbalancer.server.port=8002
+    depends_on:
+      recherche-db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      tei-embeddings: { condition: service_started }
+      tei-reranker: { condition: service_started }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  conversation:
+    build:
+      context: ..
+      dockerfile: services/conversation/Dockerfile
+    image: m3ak/conversation:0.1.0
+    container_name: m3ak-conversation
+    environment:
+      CONVERSATION_DATABASE_URL: postgresql+psycopg://u_conversation:${POSTGRES_CONVERSATION_PASSWORD}@conversation-db:5432/db_conversation
+      CONVERSATION_INTERNAL_TOKEN: ${INTERNAL_TOKEN}
+      CONVERSATION_RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/%2F
+      CONVERSATION_URL_RECHERCHE: http://recherche:8002
+      CONVERSATION_URL_LLM: http://llm:8005
+    networks: [edge, internal]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=m3ak-edge
+      - traefik.http.routers.conversation.rule=Host(`conversation.m3ak.localhost`)
+      - traefik.http.services.conversation.loadbalancer.server.port=8003
+    depends_on:
+      conversation-db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8003/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  documents:
+    build:
+      context: ..
+      dockerfile: services/documents/Dockerfile
+    image: m3ak/documents:0.1.0
+    container_name: m3ak-documents
+    environment:
+      DOCUMENTS_DATABASE_URL: postgresql+psycopg://u_documents:${POSTGRES_DOCUMENTS_PASSWORD}@documents-db:5432/db_documents
+      DOCUMENTS_INTERNAL_TOKEN: ${INTERNAL_TOKEN}
+      DOCUMENTS_RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/%2F
+    networks: [edge, internal]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=m3ak-edge
+      - traefik.http.routers.documents.rule=Host(`documents.m3ak.localhost`)
+      - traefik.http.services.documents.loadbalancer.server.port=8004
+    depends_on:
+      documents-db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8004/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  llm:
+    build:
+      context: ..
+      dockerfile: services/llm/Dockerfile
+    image: m3ak/llm:0.1.0
+    container_name: m3ak-llm
+    environment:
+      LLM_DATABASE_URL: postgresql+psycopg://u_llm:${POSTGRES_LLM_PASSWORD}@llm-db:5432/db_llm
+      LLM_INTERNAL_TOKEN: ${INTERNAL_TOKEN}
+      LLM_RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/%2F
+      LLM_REDIS_URL: redis://redis:6379/0
+      # Fournisseurs de génération : zai | google | local.
+      LLM_FOURNISSEUR_DEFAUT: ${LLM_FOURNISSEUR_DEFAUT:-zai}
+      # Z.ai (GLM) — abonnement du porteur ; Coding Plan : passer
+      # LLM_ZAI_URL=https://api.z.ai/api/coding/paas/v4 dans infra/.env.
+      LLM_ZAI_URL: ${LLM_ZAI_URL:-https://api.z.ai/api/paas/v4}
+      LLM_ZAI_API_KEY: ${ZAI_API_KEY:-}
+      LLM_ZAI_MODELE: ${LLM_ZAI_MODELE:-glm-5.3-flash}
+      LLM_GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      LLM_GOOGLE_MODELE: ${LLM_GOOGLE_MODELE:-gemini-3.8-flash}
+      # LM Studio sur l'hôte (Docker Desktop résout host.docker.internal).
+      LLM_LOCAL_URL: ${LLM_LOCAL_URL:-http://host.docker.internal:1234/v1}
+      LLM_LOCAL_MODELE: ${LLM_LOCAL_MODELE:-}
+      LLM_QUOTA_REQUETES_MINUTE: ${LLM_QUOTA_REQUETES_MINUTE:-20}
+      LLM_QUOTA_JETONS_JOUR: ${LLM_QUOTA_JETONS_JOUR:-500000}
+    networks: [internal]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=m3ak-internal
+      - traefik.http.routers.llm.rule=Host(`llm.m3ak.localhost`)
+      - traefik.http.services.llm.loadbalancer.server.port=8005
+    depends_on:
+      llm-db: { condition: service_healthy }
+      rabbitmq: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8005/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  whatsapp:
+    build:
+      context: ..
+      dockerfile: services/whatsapp/Dockerfile
+    image: m3ak/whatsapp:0.1.0
+    container_name: m3ak-whatsapp
+    environment:
+      WHATSAPP_INTERNAL_TOKEN: ${INTERNAL_TOKEN}
+      WHATSAPP_RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/%2F
+    networks: [edge, internal]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=m3ak-edge
+      - traefik.http.routers.whatsapp.rule=Host(`whatsapp.m3ak.localhost`)
+      - traefik.http.services.whatsapp.loadbalancer.server.port=8006
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8006/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  frontend:
+    # Interface web V1 — l'entrée publique de la plateforme (phase 3).
+    # Pas de base : le navigateur passe par le proxy BFF du frontend,
+    # qui joign le service conversation sur le réseau interne.
+    build:
+      context: ..
+      dockerfile: services/frontend/Dockerfile
+    image: m3ak/frontend:0.1.0
+    container_name: m3ak-frontend
+    environment:
+      URL_CONVERSATION: http://conversation:8003
+      URL_CORPUS: http://corpus:8001
+      CORPUS_JETON_INTERNE: ${INTERNAL_TOKEN}
+    networks: [edge, internal]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=m3ak-edge
+      - traefik.http.routers.frontend.rule=Host(`m3ak.localhost`)
+      - traefik.http.services.frontend.loadbalancer.server.port=3000
+    depends_on:
+      conversation: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/fr"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped

@@ -1,0 +1,29 @@
+{
+  "description": "Une question posée en langage naturel (arabe ou français).",
+  "properties": {
+    "question": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Question",
+      "type": "string"
+    },
+    "fournisseur": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Option de test/évaluation : forcer le fournisseur de génération (zai | google | local) ; None = fournisseur par défaut de la plateforme. L'interface publique ne l'expose pas.",
+      "title": "Fournisseur"
+    }
+  },
+  "required": [
+    "question"
+  ],
+  "title": "DemandeQuestion",
+  "type": "object"
+}

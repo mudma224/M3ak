@@ -1,0 +1,24 @@
+{
+  "description": "Réponse de /health : le processus est vivant. Toujours ouvert (sans jeton).",
+  "properties": {
+    "status": {
+      "default": "ok",
+      "title": "Status",
+      "type": "string"
+    },
+    "service": {
+      "title": "Service",
+      "type": "string"
+    },
+    "version": {
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "service",
+    "version"
+  ],
+  "title": "ReponseSante",
+  "type": "object"
+}

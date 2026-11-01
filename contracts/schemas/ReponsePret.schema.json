@@ -1,0 +1,49 @@
+{
+  "$defs": {
+    "EtatDependance": {
+      "properties": {
+        "nom": {
+          "title": "Nom",
+          "type": "string"
+        },
+        "etat": {
+          "description": "ok | degrade | sans_objet",
+          "title": "Etat",
+          "type": "string"
+        }
+      },
+      "required": [
+        "nom",
+        "etat"
+      ],
+      "title": "EtatDependance",
+      "type": "object"
+    }
+  },
+  "description": "Réponse de /ready : le service peut traiter du trafic. Protégé par jeton interne.",
+  "properties": {
+    "status": {
+      "description": "ok | degrade | sans_base",
+      "title": "Status",
+      "type": "string"
+    },
+    "service": {
+      "title": "Service",
+      "type": "string"
+    },
+    "dependances": {
+      "items": {
+        "$ref": "#/$defs/EtatDependance"
+      },
+      "title": "Dependances",
+      "type": "array"
+    }
+  },
+  "required": [
+    "status",
+    "service",
+    "dependances"
+  ],
+  "title": "ReponsePret",
+  "type": "object"
+}

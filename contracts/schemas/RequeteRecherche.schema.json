@@ -1,0 +1,39 @@
+{
+  "description": "Question posée à l'index.\n\nAucun filtrage par langue : l'embedding est cross-lingue (BGE-M3) et le\nplein texte interroge les deux langues ; la stratégie de langue (travail\ndans la langue du message, repli interlingue) relève de la couche\nconversation, qui décide avec les langues renvoyées par résultat.",
+  "properties": {
+    "question": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Question",
+      "type": "string"
+    },
+    "top_k": {
+      "default": 10,
+      "maximum": 50,
+      "minimum": 1,
+      "title": "Top K",
+      "type": "integer"
+    },
+    "familles": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Restreindre la recherche à certaines familles d'unités ; None = toutes",
+      "title": "Familles"
+    }
+  },
+  "required": [
+    "question"
+  ],
+  "title": "RequeteRecherche",
+  "type": "object"
+}
